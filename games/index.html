@@ -1,0 +1,2270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SweetSweet V4</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap');
+
+  :root {
+    --base: 210;
+    --spread: 100;
+    --saturation: 100;
+    --lightness: 70;
+    --border-spot-opacity: 0.8;
+    --border-light-opacity: 0.6;
+    --bg-spot-opacity: 0.15;
+    --size: 200;
+    --border: 2;
+    --radius: 18;
+    --x: 50;
+    --y: 50;
+    --xp: 0.5;
+    --yp: 0.5;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background-color: #121212;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+    background-size: 40px 40px;
+    font-family: 'Roboto Mono', monospace;
+    color: #eee;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem 1rem 2rem 1rem;
+    gap: 2rem;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  nav {
+    width: 100%;
+    max-width: 1200px;
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1.5rem;
+    box-sizing: border-box;
+  }
+  @media (min-width: 1024px) {
+    nav {
+      display: flex;
+    }
+  }
+
+  nav ul {
+    list-style: none;
+    display: flex;
+    gap: 2rem;
+    padding: 0;
+    margin: 0;
+    font-weight: 500;
+    font-size: 1.125rem;
+  }
+
+  nav ul li a {
+    color: white;
+    text-decoration: none;
+    border-bottom: 2px solid transparent;
+    padding-bottom: 0.15rem;
+    transition: color 0.3s ease, border-bottom-color 0.3s ease;
+  }
+  nav ul li a:hover {
+    color: #d1d5db;
+  }
+  nav ul li a.active,
+  nav ul li a[aria-current="page"] {
+    border-bottom-color: white;
+  }
+
+  nav .nav-right {
+    padding: 0.5rem 1rem;
+    background: white;
+    color: black;
+    border-radius: 0.375rem;
+    text-transform: lowercase;
+    font-weight: 700;
+    box-shadow: 0 0 10px 1px #fff;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+  }
+  nav .nav-right:hover {
+    background-color: #e5e7eb;
+  }
+
+  .update-section {
+    max-width: 900px;
+    width: 100%;
+    text-align: center;
+  }
+  .update-section h1.main-title {
+    font-weight: 800;
+    font-size: 2.2rem;
+    line-height: 1.1;
+    margin-bottom: 1rem;
+  }
+
+  .update-card {
+    background: #f9fafb;
+    border-radius: 1rem;
+    padding: 1.8rem 2rem;
+    box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+    color: #111827;
+    max-width: 600px;
+    margin: 0 auto;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .update-card.dark {
+    background: #1e1e2f;
+    color: #ddd;
+  }
+
+  .update-card h2.version {
+    font-weight: 700;
+    font-size: 1.5rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .update-card h3.date {
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: #4b5563;
+    margin-bottom: 1.5rem;
+  }
+  .update-card.dark h3.date {
+    color: #9ca3af;
+  }
+
+  .update-tag {
+    display: inline-block;
+    background: linear-gradient(to bottom right, #2563eb, #60a5fa);
+    color: white;
+    font-weight: 800;
+    font-size: 0.75rem;
+    padding: 0.25rem 0.8rem;
+    border-radius: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-right: 0.8rem;
+    user-select: none;
+  }
+
+  .update-desc {
+    font-weight: 600;
+    font-size: 0.9rem;
+    display: inline-block;
+    vertical-align: middle;
+    max-width: calc(100% - 5rem);
+  }
+
+  @media (min-width: 768px) {
+    .update-section h1.main-title {
+      font-size: 3rem;
+    }
+    .update-card h2.version {
+      font-size: 2rem;
+    }
+    .update-card h3.date {
+      font-size: 1.3rem;
+    }
+    .update-desc {
+      font-size: 1rem;
+    }
+  }
+
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    width: 100%;
+    max-width: 1100px;
+  }
+
+  .card {
+    position: relative;
+    padding: 2rem 1.8rem 2.5rem 1.8rem;
+    border-radius: 18px;
+    background: rgba(25, 25, 25, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    user-select: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    overflow: visible;
+    
+    --border-size: calc(var(--border, 2) * 1px);
+    --spotlight-size: calc(var(--size, 200) * 1px);
+    --hue: calc(var(--base) + (var(--xp, 0.5) * var(--spread, 100)));
+    
+    background-image: 
+      radial-gradient(
+        var(--spotlight-size) var(--spotlight-size) at
+        calc(var(--x, 50) * 1px)
+        calc(var(--y, 50) * 1px),
+        hsl(var(--hue, 210) var(--saturation, 100%) var(--lightness, 70%) / var(--bg-spot-opacity, 0.15)),
+        transparent
+      ),
+      radial-gradient(
+        circle at center,
+        rgba(25, 25, 25, 0.9) 0%,
+        rgba(15, 15, 15, 0.95) 100%
+      );
+    
+    border: var(--border-size) solid transparent;
+    background-origin: border-box;
+    background-clip: padding-box, border-box;
+  }
+
+  .card::before {
+    content: "";
+    position: absolute;
+    top: 12px;
+    left: 16px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #f55f56;
+    box-shadow:
+      20px 0 #fdbc40,
+      40px 0 #2aca3e;
+    z-index: 3;
+  }
+
+  .card::after {
+    content: "";
+    position: absolute;
+    inset: calc(var(--border-size) * -1);
+    border: var(--border-size) solid transparent;
+    border-radius: 18px;
+    background: 
+      radial-gradient(
+        calc(var(--spotlight-size) * 0.75) calc(var(--spotlight-size) * 0.75) at
+        calc(var(--x, 50) * 1px)
+        calc(var(--y, 50) * 1px),
+        hsl(var(--hue, 210) var(--saturation, 100%) var(--lightness, 50%) / var(--border-spot-opacity, 0.8)),
+        transparent 70%
+      ),
+      radial-gradient(
+        calc(var(--spotlight-size) * 0.5) calc(var(--spotlight-size) * 0.5) at
+        calc(var(--x, 50) * 1px)
+        calc(var(--y, 50) * 1px),
+        hsl(0 100% 100% / var(--border-light-opacity, 0.6)),
+        transparent 70%
+      );
+    background-origin: border-box;
+    background-clip: border-box;
+    mask: 
+      linear-gradient(#fff 0 0) padding-box,
+      linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    z-index: -1;
+    pointer-events: none;
+  }
+
+  .card h1 {
+    font-weight: 400;
+    font-size: 1.25rem;
+    line-height: 1.4;
+    color: #ddd;
+    margin: 1rem 0 1.5rem 0;
+    user-select: text;
+    white-space: pre-line;
+    z-index: 1;
+    position: relative;
+  }
+
+  .card img {
+    width: 140px;
+    height: 140px;
+    object-fit: cover;
+    border-radius: 14px;
+    box-shadow: 0 0 20px rgba(255,255,255,0.15);
+    z-index: 1;
+    position: relative;
+  }
+
+  .shiny-btn {
+    position: relative;
+    margin-top: 1.5rem;
+    padding: 0.5rem 2rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #ddd;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1.5px solid rgba(255, 255, 255, 0.18);
+    border-radius: 9999px;
+    cursor: pointer;
+    overflow: hidden;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    transition: all 0.3s ease;
+    user-select: none;
+    z-index: 1;
+  }
+
+  .shiny-btn:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.35);
+    transform: translateY(-2px);
+  }
+  .shiny-btn::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -75%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(
+      120deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.5) 50%,
+      rgba(255, 255, 255, 0) 100%
+    );
+    transform: skewX(-25deg);
+    pointer-events: none;
+    transition: none;
+  }
+
+  .shiny-btn:hover::before {
+    animation: shiny-move 1.2s ease-in-out forwards;
+  }
+
+  @keyframes shiny-move {
+    0% {
+      left: -75%;
+    }
+    100% {
+      left: 125%;
+    }
+  }
+
+  @media (max-width: 350px) {
+    .card {
+      padding: 1.5rem 1.2rem 2rem 1.2rem;
+    }
+    .card h1 {
+      font-size: 1.1rem;
+      margin: 0.8rem 0 1.2rem 0;
+    }
+    .card img {
+      width: 120px;
+      height: 120px;
+      border-radius: 12px;
+    }
+    .shiny-btn {
+      padding: 0.4rem 1.5rem;
+      font-size: 0.8rem;
+      margin-top: 1.2rem;
+    }
+  }
+  
+  .modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+
+  .modal-content {
+    background: #111;
+    color: #fff;
+    padding: 20px;
+    border-radius: 16px;
+    width: 350px;
+    text-align: center;
+    position: relative;
+    
+    --border-size: calc(var(--border, 2) * 1px);
+    --spotlight-size: calc(var(--size, 200) * 1px);
+    --hue: calc(var(--base) + (var(--xp, 0.5) * var(--spread, 100)));
+    
+    background-image: 
+      radial-gradient(
+        var(--spotlight-size) var(--spotlight-size) at
+        calc(var(--x, 50) * 1px)
+        calc(var(--y, 50) * 1px),
+        hsl(var(--hue, 210) var(--saturation, 100%) var(--lightness, 70%) / 0.2),
+        transparent
+      ),
+      radial-gradient(
+        circle at center,
+        rgba(20, 20, 20, 0.95) 0%,
+        rgba(10, 10, 10, 0.98) 100%
+      );
+    
+    border: var(--border-size) solid transparent;
+    background-origin: border-box;
+    background-clip: padding-box, border-box;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  }
+
+  .modal-content::after {
+    content: "";
+    position: absolute;
+    inset: calc(var(--border-size) * -1);
+    border: var(--border-size) solid transparent;
+    border-radius: 16px;
+    background: 
+      radial-gradient(
+        calc(var(--spotlight-size) * 0.75) calc(var(--spotlight-size) * 0.75) at
+        calc(var(--x, 50) * 1px)
+        calc(var(--y, 50) * 1px),
+        hsl(var(--hue, 210) var(--saturation, 100%) var(--lightness, 50%) / 0.7),
+        transparent 70%
+      ),
+      radial-gradient(
+        calc(var(--spotlight-size) * 0.5) calc(var(--spotlight-size) * 0.5) at
+        calc(var(--x, 50) * 1px)
+        calc(var(--y, 50) * 1px),
+        hsl(0 100% 100% / 0.5),
+        transparent 70%
+      );
+    background-origin: border-box;
+    background-clip: border-box;
+    mask: 
+      linear-gradient(#fff 0 0) padding-box,
+      linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    z-index: -1;
+    pointer-events: none;
+  }
+
+  .close {
+    cursor: pointer;
+    font-size: 22px;
+    position: absolute;
+    top: 12px;
+    right: 15px;
+    color: #ddd;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    z-index: 2;
+  }
+
+  .close:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.1);
+  }
+
+  .modal-content h2 {
+    margin-bottom: 15px;
+    font-size: 1.5rem;
+    color: #fff;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+  }
+
+  ol {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  ol li {
+    margin: 6px 0;
+    padding: 10px 12px;
+    border-radius: 6px;
+    text-align: left;
+    font-size: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  ol li:hover {
+    transform: translateX(5px);
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  ol li:nth-child(1) { 
+    background: linear-gradient(135deg, gold, #ffd700);
+    color: #000;
+    font-weight: bold;
+    font-size: 16px;
+    box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+  }
+  ol li:nth-child(2) { 
+    background: linear-gradient(135deg, silver, #c0c0c0);
+    color: #000;
+    font-weight: bold;
+    font-size: 15px;
+    box-shadow: 0 4px 12px rgba(192, 192, 192, 0.4);
+  }
+  ol li:nth-child(3) { 
+    background: linear-gradient(135deg, #cd7f32, #b08d57);
+    color: #000;
+    font-weight: bold;
+    font-size: 14px;
+    box-shadow: 0 4px 10px rgba(205, 127, 50, 0.4);
+  }
+
+  .button-container {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-top: 15px;
+  }
+  
+  .report-button {
+    position: fixed;
+    bottom: 15px;
+    right: 15px;
+    padding: 0.7rem 1.2rem;
+    border-radius: 9999px;
+    color: #ddd;
+    font-family: 'Roboto Mono', monospace;
+    font-size: 0.85rem;
+    cursor: pointer;
+    z-index: 999;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(25, 25, 25, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+  }
+  
+  .report-button:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.7);
+    background: rgba(35, 35, 35, 0.9);
+  }
+  
+  .report-icon {
+    font-size: 1.1rem;
+  }
+  
+  .report-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .report-modal-content {
+    border-radius: 16px;
+    padding: 1.8rem;
+    width: 90%;
+    max-width: 480px;
+    position: relative;
+    background: rgba(25, 25, 25, 0.95);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 50px rgba(0, 0, 0, 0.7);
+  }
+
+  .report-modal.open .report-modal-content {
+    --border-size: calc(var(--border, 2) * 1px);
+    --spotlight-size: calc(var(--size, 200) * 1px);
+    --hue: calc(30 + (var(--xp, 0.5) * 60));
+    
+    background-image: 
+      radial-gradient(
+        var(--spotlight-size) var(--spotlight-size) at
+        calc(var(--x, 50) * 1px)
+        calc(var(--y, 50) * 1px),
+        hsl(var(--hue, 30) var(--saturation, 100%) var(--lightness, 70%) / 0.25),
+        rgba(25, 25, 25, 0.95)
+      );
+    
+    border: var(--border-size) solid transparent;
+    background-origin: border-box;
+    background-clip: padding-box, border-box;
+  }
+
+  .report-modal.open .report-modal-content::after {
+    content: "";
+    position: absolute;
+    inset: calc(var(--border-size) * -1);
+    border: var(--border-size) solid transparent;
+    border-radius: 16px;
+    background: 
+      radial-gradient(
+        calc(var(--spotlight-size) * 0.75) calc(var(--spotlight-size) * 0.75) at
+        calc(var(--x, 50) * 1px)
+        calc(var(--y, 50) * 1px),
+        hsl(var(--hue, 30) var(--saturation, 100%) var(--lightness, 50%) / 0.6),
+        transparent 70%
+      ),
+      radial-gradient(
+        calc(var(--spotlight-size) * 0.5) calc(var(--spotlight-size) * 0.5) at
+        calc(var(--x, 50) * 1px)
+        calc(var(--y, 50) * 1px),
+        hsl(0 100% 100% / 0.4),
+        transparent 70%
+      );
+    background-origin: border-box;
+    background-clip: border-box;
+    mask: 
+      linear-gradient(#fff 0 0) padding-box,
+      linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    z-index: -1;
+    pointer-events: none;
+  }
+  
+  .report-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .report-icon-modal {
+    width: 22px;
+    height: 22px;
+    margin-right: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+  }
+  
+  .report-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin: 0;
+    color: #ddd;
+  }
+  
+  .report-close {
+    position: absolute;
+    top: 1.2rem;
+    right: 1.2rem;
+    background: none;
+    border: none;
+    color: #ddd;
+    font-size: 1.3rem;
+    cursor: pointer;
+    z-index: 2;
+  }
+  
+  .report-instructions {
+    margin-bottom: 1.2rem;
+    color: #aaa;
+    font-size: 0.85rem;
+    line-height: 1.4;
+  }
+  
+  .report-textarea {
+    width: 100%;
+    min-height: 100px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    padding: 10px;
+    color: #ddd;
+    font-family: 'Roboto Mono', monospace;
+    resize: vertical;
+    margin-bottom: 1.2rem;
+    transition: all 0.3s ease;
+    font-size: 0.85rem;
+  }
+  
+  .report-textarea:focus {
+    outline: none;
+    border-color: rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.08);
+  }
+  
+  .report-tabs {
+    display: flex;
+    margin-bottom: 1.2rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .report-tab {
+    padding: 0.4rem 0.8rem;
+    background: none;
+    border: none;
+    color: #aaa;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.3s ease;
+    font-size: 0.85rem;
+  }
+  
+  .report-tab.active {
+    color: #ddd;
+    border-bottom-color: rgba(255, 255, 255, 0.3);
+  }
+  
+  .report-tab-content {
+    display: none;
+  }
+  
+  .report-tab-content.active {
+    display: block;
+  }
+  
+  .upload-area {
+    border: 2px dashed rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    padding: 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.3s ease;
+    margin-bottom: 1.2rem;
+  }
+  
+  .upload-area:hover {
+    border-color: rgba(255, 255, 255, 0.4);
+  }
+  
+  .upload-icon {
+    font-size: 1.8rem;
+    margin-bottom: 0.4rem;
+    color: rgba(255, 255, 255, 0.5);
+  }
+  
+  .upload-text {
+    color: #aaa;
+    font-size: 0.8rem;
+  }
+  
+  .report-submit {
+    width: 100%;
+    padding: 0.7rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    color: #ddd;
+    font-family: 'Roboto Mono', monospace;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+  }
+  
+  .report-submit:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+  }
+  
+  .report-submit:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  
+  .loading-spinner {
+    display: none;
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: spin 1s ease-in-out infinite;
+    margin: 0 auto;
+  }
+  
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+  
+  .status-message {
+    margin-top: 8px;
+    padding: 6px;
+    border-radius: 4px;
+    text-align: center;
+    font-size: 0.8rem;
+  }
+  
+  .status-success {
+    background-color: rgba(76, 175, 80, 0.2);
+    color: #4CAF50;
+    border: 1px solid rgba(76, 175, 80, 0.3);
+  }
+  
+  .status-error {
+    background-color: rgba(244, 67, 54, 0.2);
+    color: #F44336;
+    border: 1px solid rgba(244, 67, 54, 0.3);
+  }
+  
+  .cooldown-message {
+    background-color: rgba(255, 152, 0, 0.2);
+    color: #FF9800;
+    border: 1px solid rgba(255, 152, 0, 0.3);
+  }
+  
+  .cooldown-timer {
+    font-weight: bold;
+    margin-left: 5px;
+  }
+  .score-submission {
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .score-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .score-input-group {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .score-input {
+    flex: 1;
+    padding: 8px 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    color: #ddd;
+    font-family: 'Roboto Mono', monospace;
+    font-size: 14px;
+  }
+  
+  .score-input:focus {
+    outline: none;
+    border-color: rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.08);
+  }
+  
+  .submit-score-btn {
+    padding: 8px 16px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    color: #ddd;
+    font-family: 'Roboto Mono', monospace;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .submit-score-btn:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+  }
+  
+  .submit-score-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  
+  .score-status {
+    margin-top: 8px;
+    padding: 6px;
+    border-radius: 4px;
+    text-align: center;
+    font-size: 12px;
+  }
+  
+  .score-success {
+    background-color: rgba(76, 175, 80, 0.2);
+    color: #4CAF50;
+    border: 1px solid rgba(76, 175, 80, 0.3);
+  }
+  
+  .score-error {
+    background-color: rgba(244, 67, 54, 0.2);
+    color: #F44336;
+    border: 1px solid rgba(244, 67, 54, 0.3);
+  }
+  
+  .score-cooldown {
+    background-color: rgba(255, 152, 0, 0.2);
+    color: #FF9800;
+    border: 1px solid rgba(255, 152, 0, 0.3);
+  }
+  
+  .score-cooldown-timer {
+    font-weight: bold;
+    margin-left: 5px;
+  }
+  .score-upload-area {
+  border: 2px dashed rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  padding: 18px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.05);
+  margin: 5px 0;
+}
+
+.score-upload-area:hover {
+  border-color: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateY(-2px);
+}
+
+.score-upload-area.dragover {
+  border-color: #4CAF50;
+  background: rgba(76, 175, 80, 0.1);
+}
+
+.upload-icon {
+  font-size: 2rem;
+  margin-bottom: 8px;
+  opacity: 0.7;
+  transition: opacity 0.3s ease;
+}
+
+.score-upload-area:hover .upload-icon {
+  opacity: 1;
+}
+
+.upload-text {
+  color: #ccc;
+  font-size: 0.9rem;
+  margin: 0;
+  transition: color 0.3s ease;
+}
+
+.upload-text-small {
+  font-size: 0.8rem;
+  color: #999;
+  margin-top: 5px;
+}
+
+.score-upload-area:hover .upload-text {
+  color: #fff;
+}
+
+.file-preview {
+  margin-top: 10px;
+  text-align: center;
+}
+
+.file-preview img {
+  max-width: 100%;
+  max-height: 150px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.file-name {
+  font-size: 0.8rem;
+  color: #4CAF50;
+  margin-top: 5px;
+  word-break: break-all;
+}
+</style>
+</head>
+<body>
+  
+  <nav aria-label="Primary navigation">
+    <ul>
+      <li><a href="/">Home</a></li>
+      <li><a href="/games" class="active" aria-current="page">Games</a></li>
+      <li><a href="/ai">Ai</a></li>
+      <li><a href="/problems">Contact</a></li>
+    </ul>
+    <a href="/index.html" class="nav-right">Home</a>
+  </nav>
+
+  <section class="update-section" aria-label="Latest update">
+    <h1 class="main-title">Latest Update</h1>
+    <div class="update-card dark" role="region" tabindex="0" aria-label="Version 3.0 update details">
+      <h2 class="version">Version 4.0</h2>
+      <h3 class="date">September 23, 2025</h3>
+      <div class="update-content" style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+        <div class="update-item">
+          <span class="update-tag">NEW</span>
+          <span class="update-desc">Updated SweetSweetV4 9/23/2025</span>
+        </div>
+
+        <div class="update-item">
+          <span class="update-tag">NEW</span>
+          <span class="update-desc">Added 27 Games 9/23/2025</span>
+        </div>
+  </section>
+
+  <main class="cards-grid" role="list" aria-label="Game Cards">
+    
+    <!-- ==================== -->
+    <!-- CARD TEMPLATE START -->
+    <!-- ==================== -->
+    <!-- 
+      TO ADD A NEW GAME CARD:
+      1. Copy this entire article block
+      2. Update the following:
+         - aria-label: Change to appropriate game name
+         - h1: Update game title
+         - img src: Update image URL
+         - shiny-btn onclick: Update URL for Play button
+         - data-modal: Update to match a new modal ID
+      3. Create a corresponding modal with matching ID
+    -->
+    <article class="card" role="listitem" aria-label="Card 1" style="--base: 210; --spread: 100;">
+      <h1>POLYTRACK</h1>
+      <img src="https://www.desura.games/files/images/fe/fe917ef48f1fb76ebbf7a135d2b55322.jpg" alt="Card 1 Image" />
+
+      <div class="button-container">
+        <button class="shiny-btn" type="button" onclick="window.location.href='gameSite/poly.html'" style="padding: 12px 40px; font-size: 18px; border-radius: 10px;">Play</button>
+      </div>
+    </article>
+    <!-- ================== -->
+    <!-- CARD TEMPLATE END -->
+    <!-- ================== -->
+    
+    <!-- ==================== -->
+    <!-- CARD TEMPLATE 2 -->
+    <!-- ==================== -->
+    <article class="card" role="listitem" aria-label="Card 2" style="--base: 300; --spread: 150;">
+      <h1>JETPACK JOYRIDE</h1>
+      <img src="icons/JetPack.jpg" alt="Card 2 Image" />
+
+      <div class="button-container">
+        <button class="shiny-btn" type="button" onclick="window.location.href='gameSite/Jetpack.html'">Play</button>
+        <button class="shiny-btn open-modal-btn" data-modal="modal1">Show Top 5 Scores</button>
+      </div>
+    </article>
+
+    <article class="card" role="listitem" aria-label="Card 3" style="--base: 300; --spread: 150;">
+      <h1>SLOPE</h1>
+      <img src="icons/Slope.jpg" alt="Card 3 Image" />
+
+      <div class="button-container">
+        <button class="shiny-btn" type="button" onclick="window.location.href='gameSite/Slope.html'">Play</button>
+        <button class="shiny-btn open-modal-btn" data-modal="modal2">Show Top 5 Scores</button>
+      </div>
+    </article>
+
+    <article class="card" role="listitem" aria-label="Card 4" style="--base: 300; --spread: 150;">
+      <h1>SNOW RIDER 3D</h1>
+      <img src="icons/Snow.jpg" alt="Card 4 Image" />
+
+      <div class="button-container">
+        <button class="shiny-btn" type="button" onclick="window.location.href='gameSite/Snow.html'">Play</button>
+        <button class="shiny-btn open-modal-btn" data-modal="modal3">Show Top 5 Scores</button>
+      </div>
+    </article>
+
+    <article class="card" role="listitem" aria-label="Card 5" style="--base: 300; --spread: 150;">
+      <h1>CROSSY ROAD</h1>
+      <img src="icons/Crossy.jpg" alt="Card 4 Image" />
+
+      <div class="button-container">
+        <button class="shiny-btn" type="button" onclick="window.location.href='gameSite/Crossy.html'">Play</button>
+        <button class="shiny-btn open-modal-btn" data-modal="modal4">Show Top 5 Scores</button>
+      </div>
+    </article>
+
+    <article class="card" role="listitem" aria-label="Card 6" style="--base: 300; --spread: 150;">
+      <h1>SUBWAY SURFERS</h1>
+      <img src="icons/Subway.jpg" alt="Card 4 Image" />
+
+      <div class="button-container">
+        <button class="shiny-btn" type="button" onclick="window.location.href='gameSite/SubwaySurfers.html'">Play</button>
+        <button class="shiny-btn open-modal-btn" data-modal="modal5">Show Top 5 Scores</button>
+      </div>
+    </article>
+
+    <article class="card" role="listitem" aria-label="Card 7" style="--base: 300; --spread: 150;">
+      <h1>CRAZY CATTLE 3D</h1>
+      <img src="icons/Crazy Cattle.jpg" alt="Card 4 Image" />
+
+      <div class="button-container">
+        <button class="shiny-btn" type="button" onclick="window.location.href='gameSite/CrazyCattle3D.html'">Play</button>
+      </div>
+    </article>
+
+    <article class="card" role="listitem" aria-label="Card 8" style="--base: 300; --spread: 150;">
+      <h1>COOKIE CLICKER</h1>
+      <img src="icons/Cookie.jpg" alt="Card 4 Image" />
+
+      <div class="button-container">
+        <button class="shiny-btn" type="button" onclick="window.location.href='gameSite/CookieClicker.html'">Play</button>
+        <button class="shiny-btn open-modal-btn" data-modal="modal6">Show Top 5 Scores</button>
+      </div>
+    </article>
+
+    <article class="card" role="listitem" aria-label="Card 9" style="--base: 300; --spread: 150;">
+      <h1>MOTO X3M</h1>
+      <img src="icons/MOTO.jpg" alt="Card 4 Image" />
+
+      <div class="button-container">
+        <button class="shiny-btn" type="button" onclick="window.location.href='poly.html'">Play</button>
+      </div>
+    </article>
+
+    <article class="card" role="listitem" aria-label="Card 9v2" style="--base: 300; --spread: 150;">
+      <h1>MOTO X3M WINTER</h1>
+      <img src="icons/MOTOwinter.jpg" alt="Card 4 Image" />
+
+      <div class="button-container">
+        <button class="shiny-btn" type="button" onclick="window.location.href='poly.html'">Play</button>
+      </div>
+    </article>
+
+    <article class="card" role="listitem" aria-label="Card 9v3" style="--base: 300; --spread: 150;">
+      <h1>MOTO X3M SPOOKY</h1>
+      <img src="icons/MOTOspooky.jpg" alt="Card 4 Image" />
+
+      <div class="button-container">
+        <button class="shiny-btn" type="button" onclick="window.location.href='poly.html'">Play</button>
+      </div>
+    </article>
+
+    <article class="card" role="listitem" aria-label="Card 9v4" style="--base: 300; --spread: 150;">
+      <h1>MOTO X3M POOL</h1>
+      <img src="icons/MOTOpool.jpg" alt="Card 4 Image" />
+
+      <div class="button-container">
+        <button class="shiny-btn" type="button" onclick="window.location.href='poly.html'">Play</button>
+      </div>
+    </article>
+
+    <article class="card" role="listitem" aria-label="Card 10" style="--base: 300; --spread: 150;">
+      <h1>FNAF 1</h1>
+      <img src="icons/FNAF1.jpg" alt="Card 4 Image" />
+
+      <div class="button-container">
+        <button class="shiny-btn" type="button" onclick="window.location.href='poly.html'">Play</button>
+      </div>
+    </article>
+
+    <article class="card" role="listitem" aria-label="Card 11" style="--base: 300; --spread: 150;">
+      <h1>FNAF 2</h1>
+      <img src="icons/FNAF2.jpg" alt="Card 4 Image" />
+
+      <div class="button-container">
+        <button class="shiny-btn" type="button" onclick="window.location.href='poly.html'">Play</button>
+      </div>
+    </article>
+
+    <article class="card" role="listitem" aria-label="Card 12" style="--base: 300; --spread: 150;">
+      <h1>FNAF 3</h1>
+      <img src="icons/FNAF3.jpg" alt="Card 4 Image" />
+
+      <div class="button-container">
+        <button class="shiny-btn" type="button" onclick="window.location.href='poly.html'">Play</button>
+      </div>
+    </article>
+
+    <article class="card" role="listitem" aria-label="Card 13" style="--base: 300; --spread: 150;">
+      <h1>FNAF 4</h1>
+      <img src="icons/FNAF4.jpg" alt="Card 4 Image" />
+
+      <div class="button-container">
+        <button class="shiny-btn" type="button" onclick="window.location.href='poly.html'">Play</button>
+      </div>
+    </article>
+
+    <article class="card" role="listitem" aria-label="Card 14" style="--base: 300; --spread: 150;">
+      <h1>GRANNY</h1>
+      <img src="icons/Granny.jpg" alt="Card 4 Image" />
+
+      <div class="button-container">
+        <button class="shiny-btn" type="button" onclick="window.location.href='poly.html'">Play</button>
+      </div>
+    </article>
+
+    <article class="card" role="listitem" aria-label="Card 15" style="--base: 300; --spread: 150;">
+      <h1>TEMPLE RUN2</h1> 
+      <img src="icons/Temple2.jpg" alt="Card 4 Image" />
+
+      <div class="button-container">
+        <button class="shiny-btn" type="button" onclick="window.location.href='poly.html'">Play</button>
+      </div>
+    </article>
+
+    <article class="card" role="listitem" aria-label="Card 16" style="--base: 300; --spread: 150;">
+      <h1>LEARN TO FLY 3</h1> 
+      <img src="icons/Learn3.jpg" alt="Card 4 Image" />
+
+      <div class="button-container">
+        <button class="shiny-btn" type="button" onclick="window.location.href='poly.html'">Play</button>
+      </div>
+    </article>
+
+    <article class="card" role="listitem" aria-label="Card 17" style="--base: 300; --spread: 150;">
+      <h1>RAGDOLL ARCHERS</h1> 
+      <img src="icons/Ragdoll.jpg" alt="Card 4 Image" />
+
+      <div class="button-container">
+        <button class="shiny-btn" type="button" onclick="window.location.href='poly.html'">Play</button>
+      </div>
+    </article>
+
+    <article class="card" role="listitem" aria-label="Card 18" style="--base: 300; --spread: 150;">
+      <h1>10 MINUTES TILL DAWN</h1> 
+      <img src="icons/10mins.jpg" alt="Card 4 Image" />
+
+      <div class="button-container">
+        <button class="shiny-btn" type="button" onclick="window.location.href='poly.html'">Play</button>
+      </div>
+    </article>
+
+    <article class="card" role="listitem" aria-label="Card 19" style="--base: 300; --spread: 150;">
+      <h1>BITLIFE</h1> 
+      <img src="icons/Bitlife.jpg" alt="Card 4 Image" />
+
+      <div class="button-container">
+        <button class="shiny-btn" type="button" onclick="window.location.href='poly.html'">Play</button>
+      </div>
+    </article>
+
+    <article class="card" role="listitem" aria-label="Card 20" style="--base: 300; --spread: 150;">
+      <h1>ROOFTOP SNIPERS</h1> 
+      <img src="icons/RT.png" alt="Card 4 Image" />
+      <div class="button-container">
+        <button class="shiny-btn" type="button" onclick="window.location.href='poly.html'">Play</button>
+      </div>
+    </article>
+
+    <article class="card" role="listitem" aria-label="Card 21" style="--base: 300; --spread: 150;">
+      <h1>ROOFTOP SNIPERS 2</h1> 
+      <img src="icons/RT2.jpg" alt="Card 4 Image" />
+
+      <div class="button-container">
+        <button class="shiny-btn" type="button" onclick="window.location.href='poly.html'">Play</button>
+      </div>
+    </article>
+
+    <article class="card" role="listitem" aria-label="Card 22" style="--base: 300; --spread: 150;">
+      <h1>GEOMETRY DASH LITE</h1> 
+      <img src="icons/Geo.png" alt="Card 4 Image" />
+
+      <div class="button-container">
+        <button class="shiny-btn" type="button" onclick="window.location.href='poly.html'">Play</button>
+      </div>
+    </article>
+
+    <article class="card" role="listitem" aria-label="Card 23" style="--base: 300; --spread: 150;">
+      <h1>RETRO BOWL</h1> 
+      <img src="icons/Retro.jpg" alt="Card 4 Image" />
+
+      <div class="button-container">
+        <button class="shiny-btn" type="button" onclick="window.location.href='poly.html'">Play</button>
+      </div>
+    </article>
+
+    <article class="card" role="listitem" aria-label="Card 24" style="--base: 300; --spread: 150;">
+      <h1>GOLF ORBIT</h1> 
+      <img src="icons/Golf.png" alt="Card 4 Image" />
+
+      <div class="button-container">
+        <button class="shiny-btn" type="button" onclick="window.location.href='poly.html'">Play</button>
+      </div>
+    </article>
+
+    <article class="card" role="listitem" aria-label="Card 25" style="--base: 300; --spread: 150;">
+      <h1>Papa's Pizzaria</h1> 
+      <img src="icons/Pizzeria.jpg" alt="Card 4 Image" />
+
+      <div class="button-container">
+        <button class="shiny-btn" type="button" onclick="window.location.href='poly.html'">Play</button>
+      </div>
+    </article>
+
+    <article class="card" role="listitem" aria-label="Card 26" style="--base: 300; --spread: 150;">
+      <h1>FLEEING COMPLEX</h1> 
+      <img src="icons/Fleeing.png" alt="Card 4 Image" />
+
+      <div class="button-container">
+        <button class="shiny-btn" type="button" onclick="window.location.href='poly.html'">Play</button>
+      </div>
+    </article>
+
+    <article class="card" role="listitem" aria-label="Card 27" style="--base: 300; --spread: 150;">
+      <h1>INFILTRAITING THE AIRSHIP</h1> 
+      <img src="icons/Airship.jpg" alt="Card 4 Image" />
+
+      <div class="button-container">
+        <button class="shiny-btn" type="button" onclick="window.location.href='poly.html'">Play</button>
+      </div>
+    </article>
+    
+    <!-- ================== -->
+    <!-- CARD TEMPLATE END -->
+    <!-- ================== -->
+    
+    <!-- ADD MORE CARDS HERE USING THE TEMPLATE ABOVE -->
+    
+  </main>
+
+  <button class="report-button" id="openReportBtn">
+    <span class="report-icon">🐞</span>
+    <span>Help us to improve, submit bugs here</span>
+  </button>
+
+  <div id="reportModal" class="report-modal">
+    <div class="report-modal-content">
+      <div class="report-header">
+        <div class="report-icon-modal">!</div>
+        <h2 class="report-title">Report an Issue</h2>
+      </div>
+      <button class="report-close" id="closeReportBtn">&times;</button>
+      
+      <p class="report-instructions">Help us Improve SweetSweet by reporting any bugs or issues you encounter.</p>
+      
+      <textarea class="report-textarea" id="issueDescription" placeholder="Please describe what happened and how to reproduce the issue…"></textarea>
+      
+      <div class="report-tabs">
+        <button class="report-tab active" data-tab="screenshot">Screenshot</button>
+        <button class="report-tab" data-tab="details">Details</button>
+      </div>
+      
+      <div class="report-tab-content active" id="screenshot-tab">
+        <div class="upload-area" id="uploadArea">
+          <div class="upload-icon">📷</div>
+          <p class="upload-text">Drop image here or click to upload</p>
+        </div>
+        <input type="file" id="fileInput" accept="image/*" style="display: none;">
+      </div>
+      
+      <div class="report-tab-content" id="details-tab">
+        <p style="color: #aaa; font-size: 0.9rem;">Additional details about your system and environment can help us diagnose the issue.</p>
+      </div>
+      
+      <button class="report-submit" id="submitReport">
+        <span id="submitText">Submit Report</span>
+        <div class="loading-spinner" id="loadingSpinner"></div>
+      </button>
+      <div id="statusMessage" class="status-message"></div>
+    </div>
+  </div>
+
+  <!-- ==================== -->
+  <!-- MODAL TEMPLATE START -->
+  <!-- ==================== -->
+  <!-- 
+    TO ADD A NEW LEADERBOARD MODAL:
+    1. Copy this entire modal block
+    2. Update the following:
+       - id: Must match the data-modal attribute in the corresponding card
+       - h2: Update game title in the heading
+       - ol: Update the leaderboard entries
+  -->
+  <div id="modal1" class="modal">
+    <div class="modal-content" style="--base: 210; --spread: 100;">
+      <span class="close">&times;</span>
+      <h2>🏆 Top 5 Scores - JetPack</h2>
+      <ol>
+        <li>Vann - 2468m</li>
+      </ol>
+      
+      <!-- ================================================================= -->
+      <!-- data-game and data-modal must be matching inside score-submission -->
+      <!-- ================================================================= -->
+
+      <div class="score-submission">
+        <h3 style="margin-top:0;">Submit Your Score</h3>
+        <div class="score-form">
+          <input type="text" class="score-input" id="playerName1" placeholder="Your Name" maxlength="20">
+          
+          <div class="score-upload-area">
+            <div class="upload-icon">📸</div>
+            <p class="upload-text">Upload screenshot of your score</p>
+          </div>
+          <input type="file" class="score-file-input" accept="image/*" style="display: none;">
+          
+          <button class="submit-score-btn" data-game="PolyTrack" data-modal="modal1">Submit Score</button>
+          <div class="score-status" id="scoreStatus1"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- ================== -->
+  <!-- MODAL TEMPLATE END -->
+  <!-- ================== -->
+  
+  <!-- ==================== -->
+  <!-- MODAL TEMPLATE 2 -->
+  <!-- ==================== -->
+  <div id="modal2" class="modal">
+    <div class="modal-content" style="--base: 300; --spread: 150;">
+      <span class="close">&times;</span>
+      <h2>🏆 Top 5 Scores - Slope</h2>
+      <ol>
+        <li>Khun - 34</li>
+      </ol>
+
+      <!-- ================================================================= -->
+      <!-- data-game and data-modal must be matching inside score-submission -->
+      <!-- ================================================================= -->
+
+      <div class="score-submission">
+        <h3 style="margin-top:0;">Submit Your Score</h3>
+        <div class="score-form">
+          <input type="text" class="score-input" id="playerName1" placeholder="Your Name" maxlength="20">
+          
+          <div class="score-upload-area">
+            <div class="upload-icon">📸</div>
+            <p class="upload-text">Upload screenshot of your score</p>
+          </div>
+          <input type="file" class="score-file-input" accept="image/*" style="display: none;">
+          
+          <button class="submit-score-btn" data-game="PolyTrack 2" data-modal="modal2">Submit Score</button>
+          <div class="score-status" id="scoreStatus1"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal3" class="modal">
+    <div class="modal-content" style="--base: 300; --spread: 150;">
+      <span class="close">&times;</span>
+      <h2>🏆 Top 5 Scores - SnowRider</h2>
+      <ol>
+        <li>Khun - 84</li>
+      </ol>
+
+      <!-- ================================================================= -->
+      <!-- data-game and data-modal must be matching inside score-submission -->
+      <!-- ================================================================= -->
+
+      <div class="score-submission">
+        <h3 style="margin-top:0;">Submit Your Score</h3>
+        <div class="score-form">
+          <input type="text" class="score-input" id="playerName1" placeholder="Your Name" maxlength="20">
+
+          <div class="score-upload-area">
+            <div class="upload-icon">📸</div>
+            <p class="upload-text">Upload screenshot of your score</p>
+          </div>
+          <input type="file" class="score-file-input" accept="image/*" style="display: none;">
+
+          <button class="submit-score-btn" data-game="PolyTrack 2" data-modal="modal2">Submit Score</button>
+          <div class="score-status" id="scoreStatus1"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal4" class="modal">
+    <div class="modal-content" style="--base: 300; --spread: 150;">
+      <span class="close">&times;</span>
+      <h2>🏆 Top 5 Scores - CrossyRoad</h2>
+      <ol>
+        <li>Khun - 24</li>
+      </ol>
+
+      <!-- ================================================================= -->
+      <!-- data-game and data-modal must be matching inside score-submission -->
+      <!-- ================================================================= -->
+
+      <div class="score-submission">
+        <h3 style="margin-top:0;">Submit Your Score</h3>
+        <div class="score-form">
+          <input type="text" class="score-input" id="playerName1" placeholder="Your Name" maxlength="20">
+
+          <div class="score-upload-area">
+            <div class="upload-icon">📸</div>
+            <p class="upload-text">Upload screenshot of your score</p>
+          </div>
+          <input type="file" class="score-file-input" accept="image/*" style="display: none;">
+
+          <button class="submit-score-btn" data-game="PolyTrack 2" data-modal="modal4">Submit Score</button>
+          <div class="score-status" id="scoreStatus1"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================== -->
+  <div id="modal5" class="modal">
+    <div class="modal-content" style="--base: 300; --spread: 150;">
+      <span class="close">&times;</span>
+      <h2>🏆 Top 5 Scores - Subway</h2>
+      <ol>
+        <li>Khun - 150</li>
+      </ol>
+
+      <!-- ================================================================= -->
+      <!-- data-game and data-modal must be matching inside score-submission -->
+      <!-- ================================================================= -->
+
+      <div class="score-submission">
+        <h3 style="margin-top:0;">Submit Your Score</h3>
+        <div class="score-form">
+          <input type="text" class="score-input" id="playerName1" placeholder="Your Name" maxlength="20">
+
+          <div class="score-upload-area">
+            <div class="upload-icon">📸</div>
+            <p class="upload-text">Upload screenshot of your score</p>
+          </div>
+          <input type="file" class="score-file-input" accept="image/*" style="display: none;">
+
+          <button class="submit-score-btn" data-game="PolyTrack 2" data-modal="modal5">Submit Score</button>
+          <div class="score-status" id="scoreStatus1"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+        <div id="modal6" class="modal">
+          <div class="modal-content" style="--base: 300; --spread: 150;">
+            <span class="close">&times;</span>
+            <h2>🏆 Top 5 Cookies - Cookie Clicker</h2>
+            <ol>
+              <li>Khun - 150</li>
+            </ol>
+
+            <!-- ================================================================= -->
+            <!-- data-game and data-modal must be matching inside score-submission -->
+            <!-- ================================================================= -->
+
+            <div class="score-submission">
+              <h3 style="margin-top:0;">Submit Your Score</h3>
+              <div class="score-form">
+                <input type="text" class="score-input" id="playerName1" placeholder="Your Name" maxlength="20">
+
+                <div class="score-upload-area">
+                  <div class="upload-icon">📸</div>
+                  <p class="upload-text">Upload screenshot of your score</p>
+                </div>
+                <input type="file" class="score-file-input" accept="image/*" style="display: none;">
+
+                <button class="submit-score-btn" data-game="PolyTrack 2" data-modal="modal5">Submit Score</button>
+                <div class="score-status" id="scoreStatus1"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+  <!-- ================================================================= -->
+  <!-- data-game and data-modal must be matching inside score-submission -->
+  <!-- ================================================================= -->
+
+
+  <!-- ================== -->
+  <!-- MODAL TEMPLATE END -->
+  <!-- ================== -->
+  
+  <!-- ADD MORE MODALS HERE USING THE TEMPLATE ABOVE -->
+
+  <script>
+  const UPDATE = ({ x, y }) => {
+  document.documentElement.style.setProperty('--x', x.toFixed(2));
+  document.documentElement.style.setProperty('--xp', (x / window.innerWidth).toFixed(2));
+  document.documentElement.style.setProperty('--y', y.toFixed(2));
+  document.documentElement.style.setProperty('--yp', (y / window.innerHeight).toFixed(2));
+  
+  const cards = document.querySelectorAll('.card');
+  cards.forEach(card => {
+    const rect = card.getBoundingClientRect();
+    const cardX = x - rect.left;
+    const cardY = y - rect.top;
+    
+    card.style.setProperty('--x', cardX.toFixed(2));
+    card.style.setProperty('--y', cardY.toFixed(2));
+  });
+  
+  const modals = document.querySelectorAll('.modal-content');
+  modals.forEach(modal => {
+    const rect = modal.getBoundingClientRect();
+    const modalX = x - rect.left;
+    const modalY = y - rect.top;
+    
+    modal.style.setProperty('--x', modalX.toFixed(2));
+    modal.style.setProperty('--y', modalY.toFixed(2));
+  });
+  
+  const reportModal = document.getElementById('reportModal');
+  if (reportModal.classList.contains('open')) {
+    const reportModalContent = document.querySelector('.report-modal-content');
+    if (reportModalContent) {
+      const rect = reportModalContent.getBoundingClientRect();
+      const modalX = x - rect.left;
+      const modalY = y - rect.top;
+      
+      reportModalContent.style.setProperty('--x', modalX.toFixed(2));
+      reportModalContent.style.setProperty('--y', modalY.toFixed(2));
+    }
+  }
+};
+
+document.body.addEventListener('pointermove', UPDATE);
+
+document.querySelectorAll('.open-modal-btn').forEach(button => {
+  button.addEventListener('click', function() {
+    const modalId = this.getAttribute('data-modal');
+    const modal = document.getElementById(modalId);
+    modal.style.display = 'flex';
+    
+    const rect = modal.getBoundingClientRect();
+    const modalContent = modal.querySelector('.modal-content');
+    modalContent.style.setProperty('--x', (rect.width / 2).toFixed(2));
+    modalContent.style.setProperty('--y', (rect.height / 2).toFixed(2));
+  });
+});
+
+function resetScoreForm(modal) {
+  const button = modal.querySelector('.submit-score-btn');
+  const statusDiv = modal.querySelector('.score-status');
+  const uploadArea = modal.querySelector('.score-upload-area');
+  const fileInput = modal.querySelector('.score-file-input');
+  
+  if (button) {
+    button.disabled = false;
+    button.textContent = 'Submit Score';
+  }
+  
+  if (statusDiv) {
+    statusDiv.textContent = '';
+    statusDiv.className = 'score-status';
+    statusDiv.scrollTop = 0;
+  }
+  
+  if (uploadArea && fileInput) {
+    fileInput.value = '';
+    uploadArea.innerHTML = `
+      <div class="upload-icon">📸</div>
+      <p class="upload-text">Click or drag screenshot here</p>
+      <p class="upload-text-small">Supports JPG, PNG, GIF</p>
+    `;
+    uploadArea.style.borderColor = 'rgba(255, 255, 255, 0.3)';
+    uploadArea.classList.remove('dragover');
+  }
+}
+
+document.querySelectorAll('.close').forEach(span => {
+  span.addEventListener('click', function() {
+    const modal = this.closest('.modal');
+    resetScoreForm(modal);
+    modal.style.display = 'none';
+  });
+});
+
+window.addEventListener('click', function(event) {
+  document.querySelectorAll('.modal').forEach(modal => {
+    if (event.target === modal) {
+      resetScoreForm(modal);
+      modal.style.display = 'none';
+    }
+  });
+});
+
+const reportModal = document.getElementById('reportModal');
+const openReportBtn = document.getElementById('openReportBtn');
+const closeReportBtn = document.getElementById('closeReportBtn');
+const submitReportBtn = document.getElementById('submitReport');
+const loadingSpinner = document.getElementById('loadingSpinner');
+const submitText = document.getElementById('submitText');
+const statusMessage = document.getElementById('statusMessage');
+const uploadArea = document.getElementById('uploadArea');
+const fileInput = document.getElementById('fileInput');
+const issueDescription = document.getElementById('issueDescription');
+const reportTabs = document.querySelectorAll('.report-tab');
+
+const COOLDOWN_TIME = 5 * 60 * 1000;
+const COOLDOWN_KEY = 'sweetsweet_report_cooldown';
+
+function checkCooldown() {
+  const cooldownUntil = localStorage.getItem(COOLDOWN_KEY);
+  if (!cooldownUntil) return null;
+  
+  const now = Date.now();
+  const cooldownEnd = parseInt(cooldownUntil);
+  
+  if (now < cooldownEnd) {
+    return cooldownEnd - now;
+  } else {
+    localStorage.removeItem(COOLDOWN_KEY);
+    return null;
+  }
+}
+
+function setCooldown() {
+  const cooldownEnd = Date.now() + COOLDOWN_TIME;
+  localStorage.setItem(COOLDOWN_KEY, cooldownEnd.toString());
+}
+
+function formatTimeRemaining(ms) {
+  const minutes = Math.floor(ms / 60000);
+  const seconds = Math.floor((ms % 60000) / 1000);
+  return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+}
+
+openReportBtn.addEventListener('click', () => {
+  const cooldownRemaining = checkCooldown();
+  
+  if (cooldownRemaining) {
+    showStatus(`Please wait ${formatTimeRemaining(cooldownRemaining)} before submitting another report.`, 'cooldown');
+    return;
+  }
+  
+  reportModal.style.display = 'flex';
+  reportModal.classList.add('open');
+  
+  const rect = reportModal.getBoundingClientRect();
+  const reportModalContent = document.querySelector('.report-modal-content');
+  reportModalContent.style.setProperty('--x', (rect.width / 2).toFixed(2));
+  reportModalContent.style.setProperty('--y', (rect.height / 2).toFixed(2));
+});
+
+closeReportBtn.addEventListener('click', () => {
+  reportModal.style.display = 'none';
+  reportModal.classList.remove('open');
+  resetForm();
+});
+
+window.addEventListener('click', (event) => {
+  if (event.target === reportModal) {
+    reportModal.style.display = 'none';
+    reportModal.classList.remove('open');
+    resetForm();
+  }
+});
+
+reportTabs.forEach(tab => {
+  tab.addEventListener('click', () => {
+    const tabId = tab.getAttribute('data-tab');
+    
+    reportTabs.forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    
+    document.querySelectorAll('.report-tab-content').forEach(content => {
+      content.classList.remove('active');
+    });
+    document.getElementById(`${tabId}-tab`).classList.add('active');
+  });
+});
+
+uploadArea.addEventListener('click', () => {
+  fileInput.click();
+});
+
+uploadArea.addEventListener('dragover', (e) => {
+  e.preventDefault();
+  uploadArea.style.borderColor = 'rgba(255, 255, 255, 0.4)';
+});
+
+uploadArea.addEventListener('dragleave', () => {
+  uploadArea.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+});
+
+uploadArea.addEventListener('drop', (e) => {
+  e.preventDefault();
+  uploadArea.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+  
+  if (e.dataTransfer.files.length) {
+    fileInput.files = e.dataTransfer.files;
+    handleFileSelect();
+  }
+});
+
+fileInput.addEventListener('change', handleFileSelect);
+
+function handleFileSelect() {
+  if (fileInput.files.length) {
+    const fileName = fileInput.files[0].name;
+    uploadArea.innerHTML = `
+      <div class="upload-icon">✅</div>
+      <p class="upload-text">${fileName}</p>
+    `;
+  }
+}
+
+async function sendToDiscordWebhook(description, file = null) {
+  const WEBHOOK_URL = 'https://discord.com/api/webhooks/1420170958664237146/Rv7yjlUskrkMtGpFYoV-kzGloT8G9-gjGFNtyymL4dInSW0Mn_XW6HhW7cfILLkDuaoK';
+  
+  const embed = {
+    title: "🐛 Bug Report - SweetSweet",
+    description: description,
+    color: 0xFFA500,
+    timestamp: new Date().toISOString(),
+    fields: [
+      {
+        name: "📋 Issue Type",
+        value: "Bug Report",
+        inline: true
+      },
+      {
+        name: "🌐 Page URL",
+        value: window.location.href,
+        inline: true
+      },
+      {
+        name: "🕒 Reported At",
+        value: new Date().toLocaleString(),
+        inline: true
+      },
+      {
+        name: "🔍 User Agent",
+        value: `\`\`\`${navigator.userAgent.substring(0, 1000)}\`\`\``,
+        inline: false
+      },
+      {
+        name: "📊 Screen Resolution",
+        value: `${screen.width}x${screen.height}`,
+        inline: true
+      },
+      {
+        name: "🌍 Language",
+        value: navigator.language,
+        inline: true
+      }
+    ],
+    footer: {
+      text: "SweetSweet Support System"
+    }
+  };
+
+  const payload = {
+    username: "SweetSweet Bug Reporter",
+    embeds: [embed]
+  };
+
+  try {
+    let response;
+    
+    if (file) {
+      const formData = new FormData();
+      formData.append('payload_json', JSON.stringify(payload));
+      formData.append('file', file);
+      
+      response = await fetch(WEBHOOK_URL, {
+        method: 'POST',
+        body: formData
+      });
+    } else {
+      response = await fetch(WEBHOOK_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+    }
+    
+    if (response.status === 200 || response.status === 204) {
+      return { success: true, message: "Thank you! Your report has been submitted successfully." };
+    } else if (response.status === 429) {
+      const retryAfter = response.headers.get('Retry-After');
+      return { 
+        success: false, 
+        message: `Rate limited. Please try again in ${retryAfter} seconds.` 
+      };
+    } else {
+      let errorDetail = '';
+      try {
+        const errorData = await response.text();
+        errorDetail = ` - ${errorData.substring(0, 100)}`;
+      } catch (e) {
+      }
+      
+      return { 
+        success: false, 
+        message: `Failed to send report (HTTP ${response.status}${errorDetail}). Please try again.` 
+      };
+    }
+  } catch (error) {
+    console.error('Error sending to Discord:', error);
+    return { 
+      success: false, 
+      message: 'Network error. Please check your connection and try again.' 
+    };
+  }
+}
+
+submitReportBtn.addEventListener('click', async () => {
+  const cooldownRemaining = checkCooldown();
+  if (cooldownRemaining) {
+    showStatus(`Please wait ${formatTimeRemaining(cooldownRemaining)} before submitting another report.`, 'cooldown');
+    return;
+  }
+
+  if (!issueDescription.value.trim()) {
+    showStatus('Please describe the issue before submitting.', 'error');
+    return;
+  }
+
+  submitText.style.display = 'none';
+  loadingSpinner.style.display = 'block';
+  submitReportBtn.disabled = true;
+  statusMessage.textContent = '';
+  statusMessage.className = 'status-message';
+
+  try {
+    const file = fileInput.files.length > 0 ? fileInput.files[0] : null;
+    const result = await sendToDiscordWebhook(issueDescription.value, file);
+    
+    if (result.success) {
+      setCooldown();
+      showStatus(result.message, 'success');
+      
+      setTimeout(() => {
+        reportModal.style.display = 'none';
+        reportModal.classList.remove('open');
+        resetForm();
+      }, 3000);
+    } else {
+      showStatus(result.message, 'error');
+    }
+  } catch (error) {
+    showStatus('An unexpected error occurred. Please try again.', 'error');
+  } finally {
+    submitReportBtn.disabled = false;
+    submitText.style.display = 'block';
+    loadingSpinner.style.display = 'none';
+  }
+});
+
+console.log(`Share SweetSweet With everyone!`, 
+    'color: #ff6b6b; font-size: 14px; font-weight: bold; background: #2d3436; padding: 5px; border-radius: 3px;');
+
+function resetForm() {
+  issueDescription.value = '';
+  fileInput.value = '';
+  uploadArea.innerHTML = `
+    <div class="upload-icon">📷</div>
+    <p class="upload-text">Drop image here or click to upload</p>
+  `;
+  submitText.style.display = 'block';
+  loadingSpinner.style.display = 'none';
+  submitReportBtn.disabled = false;
+  statusMessage.textContent = '';
+  statusMessage.className = 'status-message';
+}
+
+function showStatus(message, type) {
+  statusMessage.textContent = message;
+  statusMessage.className = `status-message status-${type}`;
+  
+  if (type === 'cooldown') {
+    const cooldownRemaining = checkCooldown();
+    if (cooldownRemaining) {
+      const timerElement = document.createElement('span');
+      timerElement.className = 'cooldown-timer';
+      timerElement.textContent = formatTimeRemaining(cooldownRemaining);
+      statusMessage.appendChild(timerElement);
+      
+      const timerInterval = setInterval(() => {
+        const remaining = checkCooldown();
+        if (remaining) {
+          timerElement.textContent = formatTimeRemaining(remaining);
+        } else {
+          clearInterval(timerInterval);
+          statusMessage.textContent = 'You can now submit a new report.';
+          statusMessage.className = 'status-message status-success';
+        }
+      }, 1000);
+    }
+  }
+}
+
+window.addEventListener('load', () => {
+  const cooldownRemaining = checkCooldown();
+  if (cooldownRemaining) {
+    console.log(`Cooldown active: ${formatTimeRemaining(cooldownRemaining)} remaining`);
+  }
+});
+
+function handleScoreFileSelect(uploadArea, fileInput) {
+  if (fileInput.files.length) {
+    const file = fileInput.files[0];
+    
+    if (file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        uploadArea.innerHTML = `
+          <div class="file-preview">
+            <img src="${e.target.result}" alt="Score screenshot">
+            <div class="file-name">${file.name}</div>
+          </div>
+          <p class="upload-text-small">Click to change image</p>
+        `;
+      };
+      reader.readAsDataURL(file);
+    } else {
+      uploadArea.innerHTML = `
+        <div class="upload-icon">❌</div>
+        <p class="upload-text">Invalid file type</p>
+        <p class="upload-text-small">Please select an image file</p>
+      `;
+      fileInput.value = '';
+    }
+  }
+}
+
+const SCORE_COOLDOWN_TIME = 30 * 1000;
+const SCORE_COOLDOWN_KEY = 'sweetsweet_score_cooldown';
+
+function checkScoreCooldown() {
+  const cooldownUntil = localStorage.getItem(SCORE_COOLDOWN_KEY);
+  if (!cooldownUntil) return null;
+  
+  const now = Date.now();
+  const cooldownEnd = parseInt(cooldownUntil);
+  
+  if (now < cooldownEnd) {
+    return cooldownEnd - now;
+  } else {
+    localStorage.removeItem(SCORE_COOLDOWN_KEY);
+    return null;
+  }
+}
+
+function setScoreCooldown() {
+  const cooldownEnd = Date.now() + SCORE_COOLDOWN_TIME;
+  localStorage.setItem(SCORE_COOLDOWN_KEY, cooldownEnd.toString());
+}
+
+function formatScoreTimeRemaining(ms) {
+  const seconds = Math.floor(ms / 1000);
+  return `${seconds} seconds`;
+}
+
+async function submitScore(event) {
+  event.preventDefault();
+  event.stopPropagation();
+  
+  const button = event.target;
+  const gameName = button.getAttribute('data-game');
+  const modalId = button.getAttribute('data-modal');
+  const modal = document.getElementById(modalId);
+  
+  const nameInput = modal.querySelector('.score-input');
+  const fileInput = modal.querySelector('.score-file-input');
+  const statusDiv = modal.querySelector('.score-status');
+  
+  const playerName = nameInput.value.trim();
+  const scoreFile = fileInput.files[0];
+  
+  if (!playerName) {
+    showScoreStatus(statusDiv, 'Please enter your name.', 'error');
+    nameInput.focus();
+    return;
+  }
+  
+  if (!scoreFile) {
+    showScoreStatus(statusDiv, 'Please upload a screenshot of your score.', 'error');
+    return;
+  }
+  
+  if (!scoreFile.type.startsWith('image/')) {
+    showScoreStatus(statusDiv, 'Please upload an image file (JPG, PNG, etc.).', 'error');
+    return;
+  }
+  
+  const cooldownRemaining = checkScoreCooldown();
+  if (cooldownRemaining) {
+    showScoreStatus(statusDiv, `Please wait ${formatScoreTimeRemaining(cooldownRemaining)} before submitting another score.`, 'cooldown');
+    return;
+  }
+  
+  const originalText = button.textContent;
+  
+  button.disabled = true;
+  button.textContent = 'Submitting...';
+  
+  try {
+    const result = await sendScoreToDiscord(playerName, scoreFile, gameName);
+    
+    if (result.success) {
+      setScoreCooldown();
+      showScoreStatus(statusDiv, result.message, 'success');
+      
+      nameInput.value = '';
+      fileInput.value = '';
+      const uploadArea = modal.querySelector('.score-upload-area');
+      uploadArea.innerHTML = `
+        <div class="upload-icon">📸</div>
+        <p class="upload-text">Click or drag screenshot here</p>
+        <p class="upload-text-small">Supports JPG, PNG, GIF</p>
+      `;
+      
+      setTimeout(() => {
+        button.disabled = false;
+        button.textContent = originalText;
+      }, 3000);
+    } else {
+      showScoreStatus(statusDiv, result.message, 'error');
+      button.disabled = false;
+      button.textContent = originalText;
+    }
+  } catch (error) {
+    showScoreStatus(statusDiv, 'An unexpected error occurred. Please try again.', 'error');
+    button.disabled = false;
+    button.textContent = originalText;
+  }
+}
+
+async function sendScoreToDiscord(playerName, scoreFile, gameName) {
+  const WEBHOOK_URL = 'https://discord.com/api/webhooks/1420170958664237146/Rv7yjlUskrkMtGpFYoV-kzGloT8G9-gjGFNtyymL4dInSW0Mn_XW6HhW7cfILLkDuaoK';
+  
+  const embed = {
+    title: "🏆 New Score Submission",
+    description: `**${playerName}** just submitted a score for **${gameName}**!`,
+    color: 65280,
+    timestamp: new Date().toISOString(),
+    fields: [
+      {
+        name: "🎮 Game",
+        value: gameName,
+        inline: true
+      },
+      {
+        name: "👤 Player",
+        value: playerName,
+        inline: true
+      },
+      {
+        name: "🌐 Page URL",
+        value: window.location.href,
+        inline: false
+      },
+      {
+        name: "🕒 Submitted At",
+        value: new Date().toLocaleString(),
+        inline: true
+      }
+    ],
+    footer: {
+      text: "SweetSweet Score System"
+    }
+  };
+
+  const payload = {
+    username: "SweetSweet Score Reporter",
+    embeds: [embed]
+  };
+
+  try {
+    const formData = new FormData();
+    formData.append('payload_json', JSON.stringify(payload));
+    formData.append('file', scoreFile, scoreFile.name);
+    
+    const response = await fetch(WEBHOOK_URL, {
+      method: 'POST',
+      body: formData
+    });
+    
+    if (response.ok) {
+      return { 
+        success: true, 
+        message: "Score submitted successfully! Thank you for playing." 
+      };
+    } else {
+      const errorText = await response.text();
+      return { 
+        success: false, 
+        message: `Failed to submit score. Please try again.` 
+      };
+    }
+  } catch (error) {
+    return { 
+      success: false, 
+      message: 'Network error. Please check your connection and try again.' 
+    };
+  }
+}
+
+function showScoreStatus(statusDiv, message, type) {
+  statusDiv.textContent = message;
+  statusDiv.className = `score-status score-${type}`;
+  statusDiv.style.overflowY = 'auto';
+  statusDiv.style.maxHeight = '60px';
+  
+  setTimeout(() => {
+    statusDiv.scrollTop = statusDiv.scrollHeight;
+  }, 100);
+  
+  if (type === 'cooldown') {
+    const cooldownRemaining = checkScoreCooldown();
+    if (cooldownRemaining) {
+      const timerElement = document.createElement('span');
+      timerElement.className = 'score-cooldown-timer';
+      timerElement.textContent = formatScoreTimeRemaining(cooldownRemaining);
+      statusDiv.appendChild(timerElement);
+      
+      const timerInterval = setInterval(() => {
+        const remaining = checkScoreCooldown();
+        if (remaining) {
+          timerElement.textContent = formatScoreTimeRemaining(remaining);
+        } else {
+          clearInterval(timerInterval);
+          statusDiv.textContent = 'You can now submit a new score.';
+          statusDiv.className = 'score-status score-success';
+        }
+      }, 1000);
+    }
+  }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('.submit-score-btn').forEach(button => {
+    button.addEventListener('click', submitScore);
+  });
+  
+  document.querySelectorAll('.score-upload-area').forEach(uploadArea => {
+    const fileInput = uploadArea.nextElementSibling;
+    
+    uploadArea.addEventListener('click', () => {
+      fileInput.click();
+    });
+    
+    uploadArea.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      uploadArea.classList.add('dragover');
+      uploadArea.style.borderColor = '#4CAF50';
+    });
+    
+    uploadArea.addEventListener('dragleave', () => {
+      uploadArea.classList.remove('dragover');
+      uploadArea.style.borderColor = 'rgba(255, 255, 255, 0.3)';
+    });
+    
+    uploadArea.addEventListener('drop', (e) => {
+      e.preventDefault();
+      uploadArea.classList.remove('dragover');
+      uploadArea.style.borderColor = 'rgba(255, 255, 255, 0.3)';
+      
+      if (e.dataTransfer.files.length) {
+        fileInput.files = e.dataTransfer.files;
+        handleScoreFileSelect(uploadArea, fileInput);
+      }
+    });
+  });
+  
+  document.querySelectorAll('.score-file-input').forEach(fileInput => {
+    fileInput.addEventListener('change', function() {
+      const uploadArea = this.previousElementSibling;
+      handleScoreFileSelect(uploadArea, this);
+    });
+  });
+});
+</script>
+</body>
+</html>
